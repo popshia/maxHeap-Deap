@@ -19,6 +19,7 @@ typedef struct DataStruct {
     //string schoolName = "\0" ;
     //string departmentNum = "\0" ;
     //string departmentName = "\0" ;
+    int index = 0 ;
     int student = 0 ;
     int teacher = 0 ;
     int graduated = 0 ;
@@ -49,6 +50,7 @@ public:
         
         while ( getline( input, sentence ) ) {
             // cout << sentence << endl ;
+            tempData.index = Count + 1 ;
             tempData.wholeSentence = sentence ;
             vector<string> cut ;
             string token ;
@@ -111,12 +113,12 @@ public:
         maxHeap.insert( maxHeap.begin(), emptyRoot ) ;
         Build() ;
         
-        int size = (int)maxHeap.size() - 1 ; // size用來記錄「目前要處理的矩陣」之長度
+        /* int size = (int)maxHeap.size() - 1 ; // size用來記錄「目前要處理的矩陣」之長度
         for ( int i = (int)maxHeap.size() - 1 ; i >= 2 ; i-- ) {
-            swap( maxHeap[1], maxHeap[i] ) ; // 將最大值放到array的最後一個位置
+            //swap( maxHeap[1], maxHeap[i] ) ; // 將最大值放到array的最後一個位置
             size-- ;
             MaxHeapify( 1, size ) ; // 調整「忽略最後一個位置」的矩陣
-        }
+        } */
         
         maxHeap.erase( maxHeap.begin() ) ; // 將index(0)刪除
     } // MaxHeap()
@@ -132,7 +134,14 @@ public:
     } // Combine()
     
     void Print( vector<DataStruct> data ) {
-    }
+        if ( data == maxHeap ) cout << "<MAX HEAP>" << endl ;
+        else cout << "<DEAP>" << endl ;
+        cout << "root: [" << data.front().index<< "] " << data.front().student << endl ;
+        int rightMost = 0 ;
+        for ( int i = data.size() ; i / 2  )
+        cout << "rightmost bottom: [" << data.front().index<< "] " << data.front().student << endl ;
+        cout << "leftmost bottom: [" << data.back().index<< "] " << data.back().student << endl ;
+    } // Print()
 } ; // OutStandingMove
 
 int main() {
