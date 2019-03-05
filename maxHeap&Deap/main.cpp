@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <time.h>
+#include <math.h>
 
 using namespace std ;
 
@@ -33,13 +34,13 @@ static int Count = 0 ;
 
 class OutStandingMove {
     vector<DataStruct> dataBase ;
+    vector<DataStruct> maxHeap ;
+    vector<DataStruct> deap ;
     vector<DataStruct> leftDeap ;
     vector<DataStruct> rightDeap ;
     DataStruct tempData ;
     
 public:
-    vector<DataStruct> maxHeap ;
-    vector<DataStruct> deap ;
     
     void InputData() { // tool
         dataBase.clear() ;
@@ -133,15 +134,24 @@ public:
         // deap.push_back( rightDeap ) ;
     } // Combine()
     
-    void Print( vector<DataStruct> data ) {
-        if ( data == maxHeap ) cout << "<MAX HEAP>" << endl ;
-        else cout << "<DEAP>" << endl ;
-        cout << "root: [" << data.front().index<< "] " << data.front().student << endl ;
-        int rightMost = 0 ;
-        for ( int i = data.size() ; i / 2  )
-        cout << "rightmost bottom: [" << data.front().index<< "] " << data.front().student << endl ;
-        cout << "leftmost bottom: [" << data.back().index<< "] " << data.back().student << endl ;
-    } // Print()
+    void PrintMaxHeap() {
+        for ( int i = 0 ; i < maxHeap.size() ; i ++ ) cout << maxHeap[i].student << endl ;
+        cout << "<MAX HEAP>" << endl ;
+        cout << "root: [" << maxHeap.front().index<< "] " << maxHeap.front().student << endl ;
+        cout << "rightmost bottom: [" << maxHeap.back().index<< "] " << maxHeap.back().student << endl ;
+        int leftMost = 0 ;
+        for ( int i = 1 ; i < maxHeap.size() ; leftMost++ ) i *= 2 ;
+        leftMost = pow( 2,leftMost-1 ) - 1 ;
+        cout << leftMost << endl ;
+        cout << "leftmost bottom: [" << maxHeap[leftMost].index<< "] " << maxHeap[leftMost].student << endl ;
+    } // PrintMaxHeap()
+    
+    void PrintDeap() {
+        cout << "<DEAP>" << endl ;
+        cout << "root: [" << deap[0].index<< "] " << deap[0].student << endl ;
+        cout << "rightmost bottom: [" << deap[2].index<< "] " << deap[2].student << endl ;
+        cout << "leftmost bottom: [" << deap[1].index<< "] " << deap[1].student << endl ;
+    }
 } ; // OutStandingMove
 
 int main() {
@@ -156,6 +166,7 @@ int main() {
         cout << "***** 0 : Quit                      *****" << endl ;
         cout << "***** 1 : Build a Max Heap          *****" << endl ;
         cout << "***** 2 : Build a Deap              *****" << endl ;
+        cout << "*****************************************" << endl ;
         cout << endl << "Please enter your choice :" << endl ;
         
         cin >> command ; // read in user command
@@ -189,7 +200,7 @@ int main() {
                     if ( input.is_open() ) {
                         function1.InputData() ;
                         function1.MaxHeap() ;
-                        function1.Print( function1.maxHeap ) ; // print
+                        function1.PrintMaxHeap() ; // print
                         input.close() ;
                         output.close() ;
                         function1Confirm = true ;
@@ -221,7 +232,7 @@ int main() {
                     if ( input.is_open() ) {
                         function2.InputData() ;
                         function2.Deapify() ; // sort
-                        function2.Print( function2.deap ) ;
+                        function2.PrintDeap() ;
                         input.close() ;
                         output.close() ;
                         function2Confirm = true ;
