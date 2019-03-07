@@ -22,9 +22,9 @@ typedef struct DataStruct {
     //string departmentName = "\0" ;
     int index = 0 ;
     int student = 0 ;
-    int teacher = 0 ;
-    int graduated = 0 ;
-    string wholeSentence = "\0" ;
+    //int teacher = 0 ;
+    //int graduated = 0 ;
+    //string wholeSentence = "\0" ;
 } DataStruct ;
 
 static ifstream input ;
@@ -33,7 +33,6 @@ static string FileN = "0" ;
 static int Count = 0 ;
 
 class OutStandingMove {
-    vector<DataStruct> dataBase ;
     vector<DataStruct> maxHeap ;
     vector<DataStruct> deap ;
     vector<DataStruct> leftDeap ;
@@ -41,9 +40,14 @@ class OutStandingMove {
     DataStruct tempData ;
 
 public:
-
-    void InputData() { // tool
-        dataBase.clear() ;
+    void InputData( int function ) { // tool
+        maxHeap.clear() ;
+        maxHeap.clear() ;
+        deap.clear() ;
+        leftDeap.clear() ;
+        rightDeap.clear() ;
+        tempData.student = 0 ;
+        tempData.index = 0 ;
         string sentence = "\0" ;
         getline( input, sentence ) ;
         getline( input, sentence ) ;
@@ -52,7 +56,7 @@ public:
         while ( getline( input, sentence ) ) {
             // cout << sentence << endl ;
             tempData.index = Count + 1 ;
-            tempData.wholeSentence = sentence ;
+            // tempData.wholeSentence = sentence ;
             vector<string> cut ;
             string token ;
             istringstream cutStream( sentence ) ;
@@ -72,60 +76,62 @@ public:
             } // erase '"' & ','
             tempData.student = atoi( cut[6].c_str() ) ;
 
-            if ( cut[8].size() > 3 ) {
+            /*if ( cut[8].size() > 3 ) {
                 cut[8].erase( find( cut[8].begin(), cut[8].end(), '"' ) ) ;
                 cut[8].erase( find( cut[8].begin(), cut[8].end(), ',' ) ) ;
                 cut[8].erase( find( cut[8].begin(), cut[8].end(), '"' ) ) ;
             } // erase '"' & ','
-            tempData.graduated = atoi( cut[8].c_str() ) ;
-            dataBase.push_back( tempData ) ;
+            tempData.graduated = atoi( cut[8].c_str() ) ;*/
+            if ( function == 1 ) {
+                maxHeap.push_back( tempData ) ;
+                MaxHeap() ;
+            } // function 1
+            
+            /*if ( function == 2 ) {
+                deap.push_back( tempData ) ;
+            } // function 2*/
             Count++ ;
         } // get the whole file
     } // InputData()
 
-    void MaxHeapify( int root, int length ) {
-        int left = 2 * root ; // 取得left child
-        int right = 2 * root + 1 ; // 取得right child
-        int largest = 0 ; // largest用來記錄包含root與child, 三者之中Key最大的node
-
-        if ( left <= length && maxHeap[left].student > maxHeap[root].student )
-            largest = left ;
-        else
-            largest = root ;
-
-        if ( right <= length && maxHeap[right].student > maxHeap[largest].student )
-            largest = right ;
+    void MaxHeapify( int child ) {
+        int root = child / 2 ; // 取得root
+        int largest = root ; // largest用來記錄包含root與child, 三者之中Key最大的node
+        
+        if ( root >= 1 && maxHeap[child].student > maxHeap[root].student )
+            largest = child ;
 
         if ( largest != root ) { // 如果目前root的Key不是三者中的最大
             swap( maxHeap[largest], maxHeap[root] ) ; // 就調換root與三者中Key最大的node之位置
-            MaxHeapify( largest, length ) ; // 調整新的subtree成Max Heap
+            MaxHeapify( root ) ; // 調整新的subtree成Max Heap
+        } // if()
+    } // MaxHeapify()
+    
+    void MinHeapify( int child ) {
+        int root = child / 2 ; // 取得root
+        int smallest = root ; // largest用來記錄包含root與child, 三者之中Key最大的node
+        
+        if ( root >= 1 && maxHeap[child].student < maxHeap[root].student )
+            smallest = child ;
+        
+        if ( smallest != root ) { // 如果目前root的Key不是三者中的最大
+            swap( maxHeap[smallest], maxHeap[root] ) ; // 就調換root與三者中Key最大的node之位置
+            MinHeapify( root ) ; // 調整新的subtree成Max Heap
         } // if()
     } // MaxHeapify()
 
-    void Build() {
-        for ( int i = (int)maxHeap.size() / 2 ; i >= 1 ; i-- ) {
-            MaxHeapify( i, (int)maxHeap.size() - 1 ) ; // length要減一, 因為heap從1開始存放資料
-        } // run the whole vector to build a max heap
-    } // Build()
-
     void MaxHeap() {
-        maxHeap = dataBase ;
         DataStruct emptyRoot ;
         maxHeap.insert( maxHeap.begin(), emptyRoot ) ;
-        Build() ;
-
-        /*int size = (int)maxHeap.size() - 1 ; // size用來記錄「目前要處理的矩陣」之長度
-        for ( int i = (int)maxHeap.size() - 1 ; i >= 2 ; i-- ) {
-            swap( maxHeap[1], maxHeap[i] ) ; // 將最大值放到array的最後一個位置
-            size-- ;
-            MaxHeapify( 1, size ) ; // 調整「忽略最後一個位置」的矩陣
-        }*/
-
+        MaxHeapify( (int)maxHeap.size() - 1 ) ;
         maxHeap.erase( maxHeap.begin() ) ; // 將index(0)刪除
     } // MaxHeap()
 
-    void Deapify() {
-    }
+    void Deap() {
+        DataStruct emptyRoot ; // instal the empty root
+        maxHeap.insert( maxHeap.begin(), emptyRoot ) ;
+        MaxHeapify( (int)maxHeap.size() - 1 ) ;
+    } // Deap()
 
     void Combine() {
         DataStruct emptyRoot ;
@@ -135,15 +141,16 @@ public:
     } // Combine()
 
     void PrintMaxHeap() {
-        for ( int i = 0 ; i < maxHeap.size() ; i ++ ) cout << maxHeap[i].student << endl ;
+        for ( int i = 0 ; i < maxHeap.size() ; i ++ ) cout << maxHeap[i].index << " " << maxHeap[i].student << endl ;
         cout << "<MAX HEAP>" << endl ;
         cout << "root: [" << maxHeap.front().index<< "] " << maxHeap.front().student << endl ;
         cout << "rightmost bottom: [" << maxHeap.back().index<< "] " << maxHeap.back().student << endl ;
         int leftMost = 0 ;
         for ( int i = 1 ; i < maxHeap.size() ; leftMost++ ) i *= 2;
         leftMost = pow( 2,leftMost-1 ) - 1 ;
-        cout << leftMost << endl ;
-        cout << "leftmost bottom: [" << maxHeap[leftMost].index<< "] " << maxHeap[leftMost+1].student << endl ;
+        // cout << leftMost << endl ;
+        cout << "leftmost bottom: [" << maxHeap[leftMost].index<< "] " << maxHeap[leftMost].student << endl ;
+        // cout << "leftmost+1 bottom: [" << maxHeap[leftMost+1].index<< "] " << maxHeap[leftMost+1].student << endl << endl ;
     } // PrintMaxHeap()
 
     void PrintDeap() {
@@ -198,8 +205,8 @@ int main() {
                     input.open( fileName.c_str() ) ;
                     // cut the input FileN, try to open
                     if ( input.is_open() ) {
-                        function1.InputData() ;
-                        function1.MaxHeap() ;
+                        function1.InputData(1) ;
+                        //function1.MaxHeap() ;
                         function1.PrintMaxHeap() ; // print
                         input.close() ;
                         output.close() ;
@@ -210,6 +217,7 @@ int main() {
                 } // open and sort
             } while( ! function1Confirm ) ;
 
+            Count = 0 ;
             FileN = "0" ;
         } // mission 1: Select & Bubble Sort
 
@@ -230,8 +238,7 @@ int main() {
                     input.open( fileName.c_str() ) ;
                     // cut the input FileN, try to open
                     if ( input.is_open() ) {
-                        function2.InputData() ;
-                        function2.Deapify() ; // sort
+                        function2.InputData(2) ;
                         function2.PrintDeap() ;
                         input.close() ;
                         output.close() ;
@@ -242,6 +249,7 @@ int main() {
                 } // open and sort
             } while( ! function2Confirm ) ;
 
+            Count = 0 ;
             FileN = "0" ;
         } // mission 2: Merge & Quick Sort
     } while( continueOrNot ) ;
