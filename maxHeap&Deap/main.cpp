@@ -38,6 +38,7 @@ class OutStandingMove {
     int layer = 0 ;
     int opposite = 0 ;
     int leftCorner = 0 ;
+    int displacement = 0 ;
 
 public:
     vector<DataStruct> maxHeap ;
@@ -58,8 +59,10 @@ public:
         while ( getline( input, sentence ) ) {
             // cout << sentence << endl ;
             layer = (int)floor(log2(Count+1)) ;
-            opposite = (int)exp2(layer-1) ;
-            leftCorner = opposite*3 - 1 ;
+            displacement = (int)exp2(layer-1) ;
+            leftCorner = displacement*3 - 1 ;
+            if ( Count < leftCorner ) opposite = ( Count + displacement - 1 ) / 2 ;
+            else opposite = Count - displacement ;
             tempData.index = Count ;
             // tempData.wholeSentence = sentence ;
             vector<string> cut ;
@@ -94,7 +97,7 @@ public:
 
             if ( function == 2 ) {
                 deap.push_back( tempData ) ;
-                Deap( deap, Count, leftCorner ) ;
+                CompareAndRebuild( Count ) ;
             } // function 2
 
             Count++ ;
@@ -103,12 +106,21 @@ public:
 
     void MaxHeapify( vector<DataStruct> & data, int child ) {
         int root ;
+        
         if ( Command == 1 ) root = child / 2 ; // 取得root
         else root = ( child-1 ) / 2 ;
+        
         int largest = root ; // largest用來記錄包含root與child, 三者之中Key最大的node
-
-        if ( root >= 1 && data[child].student > data[root].student )
-            largest = child ;
+        
+        if ( Command == 1 ) {
+            if ( root >= 1 && data[child].student > data[root].student )
+                largest = child ;
+        }
+        else {
+            cout << root << endl ;
+            if ( root > 2 && data[child].student > data[root].student )
+                largest = child ;
+        }
 
         if ( largest != root ) { // 如果目前root的Key不是三者中的最大
             swap( data[largest], data[root] ) ; // 就調換root與三者中Key最大的node之位置
@@ -118,12 +130,20 @@ public:
 
     void MinHeapify( vector<DataStruct> & data, int child ) {
         int root ;
+        
         if ( Command == 1 ) root = child / 2 ; // 取得root
         else root = ( child-1 ) / 2 ;
+        
         int smallest = root ; // largest用來記錄包含root與child, 三者之中Key最大的node
 
-        if ( root >= 1 && data[child].student < data[root].student )
-            smallest = child ;
+        if ( Command == 1 ) {
+            if ( root >= 1 && data[child].student < data[root].student )
+                smallest = child ;
+        }
+        else {
+            if ( root > 1 && data[child].student < data[root].student )
+                smallest = child ;
+        }
 
         if ( smallest != root ) { // 如果目前root的Key不是三者中的最大
             swap( data[smallest], data[root] ) ; // 就調換root與三者中Key最大的node之位置
@@ -139,11 +159,34 @@ public:
     } // MaxHeap()
 
     void Deap( vector<DataStruct> & data, int count, int leftCorner ) {
-        if ( count < leftCorner ) MinHeapify( data, (int)data.size() - 1 ) ;
-        else MaxHeapify( data,(int)data.size() - 1 ) ;
+        if ( count < leftCorner ) {
+            MinHeapify( data, count ) ;
+            MaxHeapify( data, opposite ) ;
+        }
+        else {
+            MaxHeapify( data, count ) ;
+            MinHeapify( data, opposite ) ;
+        }
     } // Deap()
 
-    void CompareAndRebuild() {
+    void CompareAndRebuild( int count ) {
+        //cout << "count:" << count << endl << "leftcorner:" << leftCorner << endl;
+        cout << "Layer: " << layer << endl ;
+        cout << "Count & Current data: " << count << " " << deap[count].student << endl ;
+        cout << "Opposite & Data: " << opposite << " " << deap[opposite].student << endl ;
+        cout << "Left Corner: " << leftCorner << endl ;
+        if ( count < leftCorner && deap[count].student > deap[opposite].student && opposite != 0 ) {
+            cout << "minHeap: " << deap[count].student << " " << deap[opposite].student << endl << endl ;
+            swap( deap[count], deap[opposite] ) ;
+            // cout << "count:" << count << endl << "leftcorner:" << leftCorner << endl << endl;
+        }
+        if ( count >= leftCorner && deap[count].student < deap[opposite].student && opposite != 0 ) {
+            cout << "maxHeap: " << deap[count].student << " " << deap[opposite].student << endl << endl ;
+            swap( deap[count], deap[opposite] ) ;
+            // cout << "count:" << count << endl << "leftcorner:" << leftCorner << endl << endl;
+        }
+        cout << endl ;
+        Deap( deap, count, leftCorner ) ;
     }
 
     void Print( vector<DataStruct> data ) {
