@@ -31,16 +31,19 @@ static ifstream input ;
 static ofstream output ;
 static string FileN = "0" ;
 static int Count = 1 ;
+static int Command = 0 ;
 
 class OutStandingMove {
     DataStruct tempData ;
+    int layer = 0 ;
+    int opposite = 0 ;
+    int leftCorner = 0 ;
 
 public:
     vector<DataStruct> maxHeap ;
     vector<DataStruct> deap ;
-    
+
     void InputData( int function ) { // tool
-        maxHeap.clear() ;
         maxHeap.clear() ;
         deap.clear() ;
         tempData.student = 0 ;
@@ -49,11 +52,14 @@ public:
         getline( input, sentence ) ;
         getline( input, sentence ) ;
         getline( input, sentence ) ;
-        
+
         if ( function == 2 ) deap.insert( deap.begin(), tempData ) ;
-        
+
         while ( getline( input, sentence ) ) {
             // cout << sentence << endl ;
+            layer = (int)floor(log2(Count+1)) ;
+            opposite = (int)exp2(layer-1) ;
+            leftCorner = opposite*3 - 1 ;
             tempData.index = Count ;
             // tempData.wholeSentence = sentence ;
             vector<string> cut ;
@@ -85,20 +91,22 @@ public:
                 maxHeap.push_back( tempData ) ;
                 MaxHeap( maxHeap ) ;
             } // function 1
-            
+
             if ( function == 2 ) {
                 deap.push_back( tempData ) ;
-                Deap( deap, Count ) ;
+                Deap( deap, Count, leftCorner ) ;
             } // function 2
-            
+
             Count++ ;
         } // get the whole file
     } // InputData()
 
     void MaxHeapify( vector<DataStruct> & data, int child ) {
-        int root = child / 2 ; // 取得root
+        int root ;
+        if ( Command == 1 ) root = child / 2 ; // 取得root
+        else root = ( child-1 ) / 2 ;
         int largest = root ; // largest用來記錄包含root與child, 三者之中Key最大的node
-        
+
         if ( root >= 1 && data[child].student > data[root].student )
             largest = child ;
 
@@ -107,14 +115,16 @@ public:
             MaxHeapify( data, root ) ; // 調整新的subtree成Max Heap
         } // if()
     } // MaxHeapify()
-    
+
     void MinHeapify( vector<DataStruct> & data, int child ) {
-        int root = child / 2 ; // 取得root
+        int root ;
+        if ( Command == 1 ) root = child / 2 ; // 取得root
+        else root = ( child-1 ) / 2 ;
         int smallest = root ; // largest用來記錄包含root與child, 三者之中Key最大的node
-        
+
         if ( root >= 1 && data[child].student < data[root].student )
             smallest = child ;
-        
+
         if ( smallest != root ) { // 如果目前root的Key不是三者中的最大
             swap( data[smallest], data[root] ) ; // 就調換root與三者中Key最大的node之位置
             MinHeapify( data, root ) ; // 調整新的subtree成Max Heap
@@ -128,15 +138,21 @@ public:
         data.erase( data.begin() ) ; // 將index(0)刪除
     } // MaxHeap()
 
-    void Deap( vector<DataStruct> & data, int count ) {
-        if ( count  ) MinHeapify( data, (int)data.size() - 1 ) ;
+    void Deap( vector<DataStruct> & data, int count, int leftCorner ) {
+        if ( count < leftCorner ) MinHeapify( data, (int)data.size() - 1 ) ;
         else MaxHeapify( data,(int)data.size() - 1 ) ;
     } // Deap()
 
+    void CompareAndRebuild() {
+    }
+
     void Print( vector<DataStruct> data ) {
         for ( int i = 0 ; i < data.size() ; i ++ ) cout << data[i].index << " " << data[i].student << endl ;
-        cout << "<MAX HEAP>" << endl ;
-        cout << "root: [" << data.front().index<< "] " << data.front().student << endl ;
+        if ( Command == 1 ) {
+            cout << "<MAX HEAP>" << endl ;
+            cout << "root: [" << data.front().index<< "] " << data.front().student << endl ;
+        } // function 1
+        else cout << "<DEAP>" << endl ;
         cout << "rightmost bottom: [" << data.back().index<< "] " << data.back().student << endl ;
         int leftMost = 0 ;
         for ( int i = 1 ; i < data.size() ; leftMost++ ) i *= 2;
@@ -148,7 +164,6 @@ public:
 } ; // OutStandingMove
 
 int main() {
-    int command = 0 ;
     bool continueOrNot = false ;
     OutStandingMove function1 ;
     OutStandingMove function2 ;
@@ -162,19 +177,19 @@ int main() {
         cout << "*****************************************" << endl ;
         cout << endl << "Please enter your choice :" << endl ;
 
-        cin >> command ; // read in user command
+        cin >> Command ; // read in user command
 
-        if ( command == 0 ) { // bye :(((
+        if ( Command == 0 ) { // bye :(((
             cout << "Bye :(((" << endl ;
             return 0 ;
         } // quit
 
-        else if ( command > 2 || command < 0 ) { // wrong command
+        else if ( Command > 2 || Command < 0 ) { // wrong command
             cout << "Error command! please enter an acceptable command :" << endl << endl ;
             continueOrNot = true ;
         } // wrong command
 
-        else if ( command == 1 ) { // function 1
+        else if ( Command == 1 ) { // function 1
             bool function1Confirm = false ;
 
             do {
@@ -191,7 +206,7 @@ int main() {
                     input.open( fileName.c_str() ) ;
                     // cut the input FileN, try to open
                     if ( input.is_open() ) {
-                        function1.InputData(1) ;
+                        function1.InputData(Command) ;
                         //function1.MaxHeap() ;
                         function1.Print( function1.maxHeap ) ; // print
                         input.close() ;
@@ -203,11 +218,11 @@ int main() {
                 } // open and sort
             } while( ! function1Confirm ) ;
 
-            Count = 0 ;
+            Count = 1 ;
             FileN = "0" ;
         } // mission 1: Select & Bubble Sort
 
-        else if ( command == 2 ) { // function 2
+        else if ( Command == 2 ) { // function 2
             bool function2Confirm = false ;
 
             do {
@@ -224,7 +239,7 @@ int main() {
                     input.open( fileName.c_str() ) ;
                     // cut the input FileN, try to open
                     if ( input.is_open() ) {
-                        function2.InputData(2) ;
+                        function2.InputData(Command) ;
                         function2.Print( function2.deap ) ;
                         input.close() ;
                         output.close() ;
@@ -235,7 +250,7 @@ int main() {
                 } // open and sort
             } while( ! function2Confirm ) ;
 
-            Count = 0 ;
+            Count = 1 ;
             FileN = "0" ;
         } // mission 2: Merge & Quick Sort
     } while( continueOrNot ) ;
