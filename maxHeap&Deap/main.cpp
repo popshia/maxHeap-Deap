@@ -137,14 +137,8 @@ public:
 
         int smallest = root ; // largest用來記錄包含root與child, 三者之中Key最大的node
 
-        if ( Command == 1 ) {
-            if ( root >= 1 && data[child].student < data[root].student )
+        if ( root >= 1 && data[child].student < data[root].student )
                 smallest = child ;
-        }
-        else {
-            if ( root >= 1 && data[child].student < data[root].student )
-                smallest = child ;
-        }
 
         if ( smallest != root ) { // 如果目前root的Key不是三者中的最大
             swap( data[smallest], data[root] ) ; // 就調換root與三者中Key最大的node之位置
