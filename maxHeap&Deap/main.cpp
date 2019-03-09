@@ -98,6 +98,7 @@ public:
             if ( function == 2 ) {
                 deap.push_back( tempData ) ;
                 CompareAndRebuild( Count ) ;
+                // for ( int i = 0 ; i < deap.size() ; i++ ) cout << deap[i].index << " " << deap[i].student << endl ;
             } // function 2
 
             Count++ ;
@@ -106,19 +107,19 @@ public:
 
     void MaxHeapify( vector<DataStruct> & data, int child ) {
         int root ;
-        
+
         if ( Command == 1 ) root = child / 2 ; // 取得root
         else root = ( child-1 ) / 2 ;
-        
+
         int largest = root ; // largest用來記錄包含root與child, 三者之中Key最大的node
-        
+
         if ( Command == 1 ) {
             if ( root >= 1 && data[child].student > data[root].student )
                 largest = child ;
         }
         else {
-            cout << root << endl ;
-            if ( root > 2 && data[child].student > data[root].student )
+            // cout << root << endl ;
+            if ( root >= 2 && data[child].student > data[root].student )
                 largest = child ;
         }
 
@@ -130,10 +131,10 @@ public:
 
     void MinHeapify( vector<DataStruct> & data, int child ) {
         int root ;
-        
+
         if ( Command == 1 ) root = child / 2 ; // 取得root
         else root = ( child-1 ) / 2 ;
-        
+
         int smallest = root ; // largest用來記錄包含root與child, 三者之中Key最大的node
 
         if ( Command == 1 ) {
@@ -141,7 +142,7 @@ public:
                 smallest = child ;
         }
         else {
-            if ( root > 1 && data[child].student < data[root].student )
+            if ( root >= 1 && data[child].student < data[root].student )
                 smallest = child ;
         }
 
@@ -171,26 +172,26 @@ public:
 
     void CompareAndRebuild( int count ) {
         //cout << "count:" << count << endl << "leftcorner:" << leftCorner << endl;
-        cout << "Layer: " << layer << endl ;
-        cout << "Count & Current data: " << count << " " << deap[count].student << endl ;
-        cout << "Opposite & Data: " << opposite << " " << deap[opposite].student << endl ;
-        cout << "Left Corner: " << leftCorner << endl ;
+        //cout << "Layer: " << layer << endl ;
+        //cout << "Count & Current data: " << count << " " << deap[count].student << endl ;
+        //cout << "Opposite & Data: " << opposite << " " << deap[opposite].student << endl ;
+        //cout << "Left Corner: " << leftCorner << endl ;
         if ( count < leftCorner && deap[count].student > deap[opposite].student && opposite != 0 ) {
-            cout << "minHeap: " << deap[count].student << " " << deap[opposite].student << endl << endl ;
+            //cout << "minHeap: " << deap[count].student << " " << deap[opposite].student << endl << endl ;
             swap( deap[count], deap[opposite] ) ;
             // cout << "count:" << count << endl << "leftcorner:" << leftCorner << endl << endl;
         }
         if ( count >= leftCorner && deap[count].student < deap[opposite].student && opposite != 0 ) {
-            cout << "maxHeap: " << deap[count].student << " " << deap[opposite].student << endl << endl ;
+            //cout << "maxHeap: " << deap[count].student << " " << deap[opposite].student << endl << endl ;
             swap( deap[count], deap[opposite] ) ;
             // cout << "count:" << count << endl << "leftcorner:" << leftCorner << endl << endl;
         }
-        cout << endl ;
+        //cout << endl ;
         Deap( deap, count, leftCorner ) ;
     }
 
     void Print( vector<DataStruct> data ) {
-        for ( int i = 0 ; i < data.size() ; i ++ ) cout << data[i].index << " " << data[i].student << endl ;
+        // for ( int i = 0 ; i < data.size() ; i ++ ) cout << data[i].index << " " << data[i].student << endl ;
         if ( Command == 1 ) {
             cout << "<MAX HEAP>" << endl ;
             cout << "root: [" << data.front().index<< "] " << data.front().student << endl ;
@@ -201,7 +202,7 @@ public:
         for ( int i = 1 ; i < data.size() ; leftMost++ ) i *= 2;
         leftMost = pow( 2,leftMost-1 ) - 1 ;
         // cout << leftMost << endl ;
-        cout << "leftmost bottom: [" << data[leftMost].index<< "] " << data[leftMost].student << endl ;
+        cout << "leftmost bottom: [" << data[leftMost].index<< "] " << data[leftMost].student << endl << endl ;
         // cout << "leftmost+1 bottom: [" << maxHeap[leftMost+1].index<< "] " << maxHeap[leftMost+1].student << endl << endl ;
     } // PrintMaxHeap()
 } ; // OutStandingMove
@@ -221,6 +222,7 @@ int main() {
         cout << endl << "Please enter your choice :" << endl ;
 
         cin >> Command ; // read in user command
+        cout << endl ;
 
         if ( Command == 0 ) { // bye :(((
             cout << "Bye :(((" << endl ;
@@ -238,6 +240,7 @@ int main() {
             do {
                 cout << "Please enter the file you want to build a MaxHeap or [0] to quit:" << endl ;
                 cin >> FileN ;
+                cout << endl ;
 
                 if ( FileN == "0" ) {
                     function1Confirm = true ;
@@ -271,6 +274,7 @@ int main() {
             do {
                 cout << "Please enter the file you want to buid a Deap or [0] to quit:" << endl ;
                 cin >> FileN ;
+                cout << endl ;
 
                 if ( FileN == "0" ) {
                     function2Confirm = true ;
